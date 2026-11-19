@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Royal Nikaah • Layba &amp; Ayan</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-cream: #fbf9f4;
+      --bg-sand: #f5eedf;
+      --gold-primary: #c59b27;
+      --gold-deep: #8f681a;
+      --text-main: #342817;
+      --text-muted: #796c56;
+      --accent-deep: #162e22;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: 'Playfair Display', serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Traditional Islamic 8-Point Geometric Star Watermark */
+    .islamic-lattice-bg {
+      position: fixed;
+      inset: 0;
+      opacity: 0.055;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%238f681a' fill-rule='evenodd'%3E%3Cpath d='M40 0l6.51 15.72L63.28 9.28l-6.44 16.77L74.28 33.49l-16.77 6.51 15.72 6.51-16.77 6.44 6.44 16.77-16.77-6.44L40 80l-6.51-15.72-16.77 6.44 6.44-16.77L6.39 46.51l16.77-6.51L7.44 33.49l16.77-6.44-6.44-16.77 16.77 6.44z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Ambient Falling Rose & Gold Noor Canvas */
+    #ambient-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    /* Metallic Gold Textures */
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #dfb743 0%, #aa7c11 50%, #755207 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-gradient-bg {
+      background: linear-gradient(135deg, #d8b241 0%, #f4e197 50%, #b88b1f 100%);
+    }
+
+    .gold-card-border {
+      border: 1px solid rgba(197, 155, 39, 0.45);
+      box-shadow: 0 10px 30px rgba(143, 104, 26, 0.08), inset 0 0 15px rgba(216, 178, 65, 0.05);
+    }
+
+    /* =========================================
+       STAGE 1: 3D ROYAL ENVELOPE / WAX SEAL
+       ========================================= */
+    #envelopeStage {
+      perspective: 1200px;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s ease-in-out;
+    }
+
+    .envelope-box {
+      width: 90vw;
+      max-width: 480px;
+      height: 320px;
+      position: relative;
+      background: linear-gradient(145deg, #f7efe1, #ede0ca);
+      border-radius: 18px;
+      border: 2px solid #c59b27;
+      box-shadow: 0 25px 60px rgba(110, 80, 20, 0.25), 0 0 30px rgba(216, 178, 65, 0.2);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(0 0, 100% 0, 50% 55%);
+      background: linear-gradient(180deg, #fdf8ef 0%, #f1e4d0 100%);
+      border-top: 2px solid #ecd58b;
+      transform-origin: top center;
+      transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 5;
+    }
+
+    .envelope-pocket {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip-path: polygon(0 45%, 50% 75%, 100% 45%, 100% 100%, 0 100%);
+      background: linear-gradient(160deg, #f5ecd9 0%, #ebdfc8 100%);
+      border-bottom: 2px solid #b88b1f;
+      border-radius: 0 0 18px 18px;
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .wax-seal {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #f6e6aa 0%, #c4992c 45%, #7e5a0e 100%);
+      box-shadow: 0 10px 25px rgba(110, 80, 20, 0.45), 0 0 20px rgba(216, 178, 65, 0.6);
+      border: 2px solid #fff2bf;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      animation: sealPulse 2.8s infinite ease-in-out;
+    }
+
+    @keyframes sealPulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 12px 30px rgba(110, 80, 20, 0.55), 0 0 26px rgba(216, 178, 65, 0.8); }
+    }
+
+    .card-inside {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      bottom: 15px;
+      background: #fffdf9;
+      border-radius: 12px;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .envelope-open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+    .envelope-open .card-inside {
+      transform: translateY(-90px) scale(1.03);
+    }
+    .envelope-open .wax-seal {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(1.6);
+      pointer-events: none;
+    }
+
+    /* Hanging Swaying Fanous Lanterns */
+    .fanous-lantern {
+      position: absolute;
+      transform-origin: top center;
+      animation: swingLantern 4.8s infinite ease-in-out;
+      pointer-events: none;
+      z-index: 8;
+    }
+    .fanous-left { left: 4%; top: 0; }
+    .fanous-right { right: 4%; top: 0; animation-delay: -2.4s; }
+
+    @keyframes swingLantern {
+      0%, 100% { transform: rotate(-3.5deg); }
+      50% { transform: rotate(3.5deg); }
+    }
+
+    .candle-glow {
+      animation: candleFlicker 1.8s infinite alternate ease-in-out;
+    }
+    @keyframes candleFlicker {
+      0% { opacity: 0.7; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1.05); }
+    }
+
+    /* Audio Waves Indicator */
+    .wave-bar {
+      display: inline-block;
+      width: 2.5px;
+      height: 12px;
+      background: var(--gold-primary);
+      border-radius: 2px;
+      animation: soundWave 1.2s infinite ease-in-out;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 10px; }
+    .wave-bar:nth-child(4) { animation-delay: 0.6s; height: 14px; }
+    @keyframes soundWave {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1.3); }
+    }
+    .waves-paused .wave-bar {
+      animation: none;
+      transform: scaleY(0.35);
+    }
+
+    /* Mehrab Arch styling */
+    .royal-mehrab-arch {
+      border-top-left-radius: 220px;
+      border-top-right-radius: 220px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+    }
+
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="selection:bg-amber-200">
+
+  <!-- Islamic Geometric Watermark -->
+  <div class="islamic-lattice-bg"></div>
+
+  <!-- Ambient Golden Dust & Jasmine Petals Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- ========================================================
+       STAGE 1: 3D GOLDEN ENVELOPE OPENING STAGE
+       ======================================================== -->
+  <div id="envelopeStage" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-[#fbf8f2]/95 backdrop-blur-md">
+    
+    <!-- Top Announcement -->
+    <div class="text-center mb-8 space-y-2">
+      <div class="inline-flex items-center space-x-2 text-amber-800 text-[11px] font-['Cinzel'] tracking-[0.3em] uppercase">
+        <span>❖</span>
+        <span>The Royal Matrimony</span>
+        <span>❖</span>
+      </div>
+      <h2 class="font-['Amiri'] text-3xl sm:text-4xl text-amber-900 leading-snug">
+        بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+      </h2>
+      <p class="font-['Playfair_Display'] italic text-xs text-stone-600">
+        In the name of Allah, the Most Gracious, the Most Merciful
+      </p>
+    </div>
+
+    <!-- The 3D Interactive Envelope -->
+    <div id="interactiveEnvelope" class="envelope-box" onclick="unfoldInvitation()">
+      
+      <!-- Foldable Top Flap -->
+      <div class="envelope-flap"></div>
+
+      <!-- Golden Wax Seal (Trigger) -->
+      <div class="wax-seal">
+        <i class="fa-solid fa-moon text-amber-950 text-xs mb-0.5"></i>
+        <span class="font-['Cinzel'] text-[11px] font-black text-amber-950 tracking-widest uppercase">L &amp; A</span>
+        <span class="text-[8px] font-['Cinzel'] font-bold text-amber-900 tracking-wider">OPEN</span>
+      </div>
+
+      <!-- Card Inside that slides up -->
+      <div class="card-inside">
+        <div class="w-full h-full border border-amber-600/30 rounded-lg flex flex-col items-center justify-center p-4 bg-[#fefdfa]">
+          <span class="font-['Cinzel'] text-[9px] tracking-[0.25em] text-amber-800 uppercase font-bold">The Holy Nikaah</span>
+          <h3 class="font-['Alex_Brush'] text-4xl text-amber-950 my-1">Layba &amp; Ayan</h3>
+          <p class="font-['Plus_Jakarta_Sans'] text-[10px] tracking-widest text-stone-500 uppercase font-semibold">1 December 2026</p>
+        </div>
+      </div>
+
+      <!-- Pocket Front -->
+      <div class="envelope-pocket"></div>
+    </div>
+
+    <!-- Instruction hint -->
+    <div class="mt-8 flex items-center space-x-2 text-amber-900 animate-pulse text-xs font-['Cinzel'] tracking-[0.2em] uppercase">
+      <i class="fa-solid fa-hand-pointer text-amber-700"></i>
+      <span>Tap the Gold Seal to Open</span>
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================
+       STAGE 2: MAIN ROYAL INVITATION WEBSITE
+       ======================================================== -->
+  <div id="mainWebsite" class="opacity-0 transition-opacity duration-1000 min-h-screen pb-16 relative z-10">
+
+    <!-- FLOATING TOP NAVIGATION -->
+    <nav class="sticky top-0 z-40 bg-[#fbf9f4]/90 backdrop-blur-md border-b border-amber-700/15 py-3 px-4 sm:px-8">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        
+        <!-- Royal Monogram -->
+        <a href="#welcome" class="flex items-center space-x-2">
+          <span class="font-['Cinzel'] text-xs font-bold tracking-[0.25em] text-amber-900 uppercase">
+            Layba &amp; Ayan
+          </span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8 font-['Cinzel'] text-xs tracking-[0.2em] uppercase text-stone-700">
+          <a href="#welcome" class="hover:text-amber-800 transition-colors">Welcome</a>
+          <a href="#couple" class="hover:text-amber-800 transition-colors">Couple</a>
+          <a href="#itinerary" class="hover:text-amber-800 transition-colors">Schedule</a>
+          <a href="#compliments" class="hover:text-amber-800 transition-colors">Patrons</a>
+          <a href="#dua" class="hover:text-amber-800 transition-colors">Dua Wall</a>
+        </div>
+
+        <!-- Audio Player Toggle -->
+        <button id="musicToggleBtn" onclick="toggleAudio()" class="flex items-center space-x-2.5 bg-[#f3ecdc] hover:bg-[#ede3cf] border border-amber-600/30 px-3.5 py-1.5 rounded-full text-amber-950 shadow-sm transition-all">
+          <div id="soundWaves" class="flex items-center space-x-0.5 waves-paused">
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+          </div>
+          <span id="musicBtnLabel" class="font-['Cinzel'] text-[10px] tracking-[0.18em] uppercase font-semibold text-amber-950">
+            Play Bismillah
+          </span>
+        </button>
+
+      </div>
+    </nav>
+
+
+    <!-- THREE-COLUMN ROYAL LAYOUT (Matching your reference screenshot) -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
+
+        <!-- SWAYING MOROCCAN LANTERN (LEFT) -->
+        <div class="hidden lg:block fanous-lantern fanous-left">
+          <svg width="45" height="150" viewBox="0 0 45 150" fill="none">
+            <line x1="22.5" y1="0" x2="22.5" y2="55" stroke="#936d1b" stroke-width="1.2" />
+            <path d="M12 55 H33 L37 68 H8 Z" fill="#b88b1f" stroke="#755207" stroke-width="0.8" />
+            <path d="M8 68 H37 L33 110 H12 Z" fill="#fcf6ea" stroke="#936d1b" stroke-width="1.2" />
+            <circle cx="22.5" cy="88" r="8" fill="#f6b841" class="candle-glow" filter="blur(2px)" />
+            <path d="M12 110 L22.5 130 L33 110 Z" fill="#b88b1f" stroke="#755207" stroke-width="0.8" />
+            <circle cx="22.5" cy="138" r="2.5" fill="#936d1b" />
+          </svg>
+        </div>
+
+        <!-- SWAYING MOROCCAN LANTERN (RIGHT) -->
+        <div class="hidden lg:block fanous-lantern fanous-right">
+          <svg width="45" height="150" viewBox="0 0 45 150" fill="none">
+            <line x1="22.5" y1="0" x2="22.5" y2="55" stroke="#936d1b" stroke-width="1.2" />
+            <path d="M12 55 H33 L37 68 H8 Z" fill="#b88b1f" stroke="#755207" stroke-width="0.8" />
+            <path d="M8 68 H37 L33 110 H12 Z" fill="#fcf6ea" stroke="#936d1b" stroke-width="1.2" />
+            <circle cx="22.5" cy="88" r="8" fill="#f6b841" class="candle-glow" filter="blur(2px)" />
+            <path d="M12 110 L22.5 130 L33 110 Z" fill="#b88b1f" stroke="#755207" stroke-width="0.8" />
+            <circle cx="22.5" cy="138" r="2.5" fill="#936d1b" />
+          </svg>
+        </div>
+
+
+        <!-- LEFT COLUMN: FLOATING BARAKAH DUA CARD -->
+        <div class="hidden lg:block lg:col-span-3 sticky top-24 space-y-6">
+          <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 gold-card-border text-center shadow-sm">
+            <div class="font-['Cinzel'] text-xs font-bold tracking-[0.25em] text-amber-800 mb-2">
+              L &amp; A
+            </div>
+            <div class="font-['Playfair_Display'] italic text-sm text-stone-700 font-semibold mb-3">
+              The Heirloom Union
+            </div>
+            <div class="font-['Amiri'] text-xl text-amber-950 leading-relaxed mb-3">
+              بَارَكَ اللَّهُ لَكُمَا وَبَارَكَ عَلَيْكُمَا وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ
+            </div>
+            <p class="font-['Playfair_Display'] italic text-[11px] text-stone-600 leading-relaxed">
+              "May Allah bless you and shower His blessings upon you and unite you in goodness."
+            </p>
+            <div class="w-8 h-[1px] bg-amber-600/30 mx-auto my-3"></div>
+            <div class="font-['Plus_Jakarta_Sans'] text-[10px] tracking-widest text-stone-500 uppercase">
+              Gajraula • Uttar Pradesh
+            </div>
+          </div>
+        </div>
+
+
+        <!-- CENTER COLUMN: MAIN MEHRAB INVITATION ARCH CARD -->
+        <main class="lg:col-span-6 space-y-10">
+
+          <!-- MEHRAB ARCH INVITATION -->
+          <section id="welcome" class="bg-white/95 rounded-t-[200px] rounded-b-3xl p-6 sm:p-12 gold-card-border text-center shadow-md relative overflow-hidden">
+            
+            <!-- Inner Arch Dashed Border -->
+            <div class="absolute inset-3 rounded-t-[190px] rounded-b-2xl border border-dashed border-amber-600/30 pointer-events-none"></div>
+
+            <!-- Top Monogram Crest with Floral Ring -->
+            <div class="pt-8 mb-6 flex justify-center">
+              <div class="relative w-32 h-32 rounded-full border-2 border-amber-600/40 p-2 flex items-center justify-center bg-gradient-to-br from-[#fffdf9] to-[#f4eedf] shadow-inner">
+                <div class="text-center">
+                  <span class="font-['Alex_Brush'] text-5xl gold-gradient-text block leading-none">LA</span>
+                  <span class="font-['Cinzel'] text-[8px] tracking-[0.2em] uppercase text-stone-500 font-semibold mt-1 block">Layba &amp; Ayan</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bismillah Header -->
+            <div class="space-y-1 mb-6">
+              <span class="text-amber-700 text-xs tracking-widest">❖ THE ROYAL MATRIMONY ❖</span>
+              <h1 class="font-['Amiri'] text-3xl sm:text-4xl text-amber-950 font-normal leading-snug">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </h1>
+              <p class="font-['Playfair_Display'] italic text-xs text-stone-500">
+                In the name of Allah, the Most Gracious, the Most Merciful
+              </p>
+            </div>
+
+            <!-- Quranic Ayah -->
+            <div class="max-w-md mx-auto my-4 py-3 px-4 rounded-xl bg-[#fbf8f0] border-y border-amber-700/20 text-stone-700">
+              <p class="font-['Amiri'] text-lg text-amber-950 mb-1">وَمِنْ كُلِّ شَيْءٍ خَلَقْنَا زَوْجَيْنِ</p>
+              <p class="font-['Playfair_Display'] italic text-xs leading-relaxed">
+                "And of everything We created pairs, that you may remember"
+              </p>
+              <span class="font-['Plus_Jakarta_Sans'] text-[9px] tracking-widest uppercase font-semibold text-amber-800 mt-1 block">
+                — Surah Adh-Dhariyat (51:49)
+              </span>
+            </div>
+
+            <p class="font-['Cinzel'] text-[11px] tracking-[0.25em] text-stone-500 uppercase font-semibold my-4">
+              Together with their families, we invite you to the Nikaah ceremony of
+            </p>
+
+            <!-- Bride & Groom Regal Names -->
+            <div id="couple" class="my-6 space-y-1">
+              <h2 class="font-['Alex_Brush'] text-6xl sm:text-7xl text-amber-950 leading-none">
+                Layba
+              </h2>
+              <div class="font-['Cinzel'] text-xl text-amber-700 font-semibold py-1">&amp;</div>
+              <h2 class="font-['Alex_Brush'] text-6xl sm:text-7xl text-amber-950 leading-none">
+                Ayan
+              </h2>
+            </div>
+
+            <!-- Date & Time Showcase (Exact Card Design) -->
+            <div class="max-w-xs mx-auto my-6 bg-[#fcf9f2] border border-amber-700/30 rounded-2xl p-5 shadow-sm">
+              <div class="font-['Cinzel'] text-xl font-bold tracking-[0.3em] uppercase text-amber-950 mb-1">
+                December
+              </div>
+
+              <div class="flex items-center justify-center space-x-6 py-3 border-y border-amber-700/25">
+                <span class="font-['Cinzel'] text-sm tracking-widest uppercase text-stone-600 font-semibold">
+                  Tuesday
+                </span>
+                <span class="font-['Playfair_Display'] text-5xl font-bold text-amber-900 leading-none">
+                  1
+                </span>
+                <span class="font-['Cinzel'] text-sm tracking-widest uppercase text-stone-600 font-semibold">
+                  8:00 PM
+                </span>
+              </div>
+
+              <div class="font-['Cinzel'] text-lg font-bold tracking-[0.35em] text-amber-950 mt-1">
+                2026
+              </div>
+            </div>
+
+            <!-- Venue Details -->
+            <div class="my-6 space-y-1">
+              <span class="font-['Cinzel'] text-[10px] tracking-[0.25em] uppercase text-amber-800 font-bold block">
+                Venue
+              </span>
+              <h3 class="font-['Cinzel'] text-2xl font-bold text-amber-950 tracking-wider">
+                HIGHWAY RESORT
+              </h3>
+              <p class="font-['Plus_Jakarta_Sans'] text-xs tracking-widest text-stone-600 uppercase font-medium">
+                Gajraula, Uttar Pradesh
+              </p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-3 mt-6">
+              <a href="https://www.google.com/maps/search/?api=1&query=Highway+Resort+Gajraula" target="_blank" class="px-5 py-2.5 rounded-full gold-gradient-bg text-amber-950 font-['Cinzel'] text-[11px] tracking-wider uppercase font-bold shadow-md hover:brightness-105 transition-all flex items-center space-x-2">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>View Map Location</span>
+              </a>
+              <button onclick="addToGoogleCalendar()" class="px-5 py-2.5 rounded-full bg-[#f3ecdc] text-amber-950 hover:bg-[#ebdcc0] font-['Cinzel'] text-[11px] tracking-wider uppercase font-bold shadow-sm transition-all flex items-center space-x-2 border border-amber-700/30">
+                <i class="fa-regular fa-calendar-plus text-amber-800"></i>
+                <span>Add to Calendar</span>
+              </button>
+            </div>
+
+          </section>
+
+
+          <!-- COUNTDOWN TIMER SECTION -->
+          <section class="bg-white/90 rounded-2xl p-6 sm:p-8 gold-card-border text-center shadow-sm">
+            <span class="font-['Amiri'] text-xl text-amber-900 block mb-1">إِنْ شَاءَ ٱللَّٰهُ</span>
+            <h3 class="font-['Cinzel'] text-xs tracking-[0.25em] uppercase text-stone-600 font-bold mb-5">
+              Counting the Blessed Days
+            </h3>
+
+            <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-sm mx-auto">
+              <div class="bg-[#fbf8f0] border border-amber-700/20 p-3 rounded-xl">
+                <span id="timer-days" class="font-['Playfair_Display'] text-2xl sm:text-3xl font-bold text-amber-950 block">00</span>
+                <span class="text-[9px] font-['Plus_Jakarta_Sans'] tracking-widest text-stone-500 uppercase font-semibold">Days</span>
+              </div>
+              <div class="bg-[#fbf8f0] border border-amber-700/20 p-3 rounded-xl">
+                <span id="timer-hours" class="font-['Playfair_Display'] text-2xl sm:text-3xl font-bold text-amber-950 block">00</span>
+                <span class="text-[9px] font-['Plus_Jakarta_Sans'] tracking-widest text-stone-500 uppercase font-semibold">Hours</span>
+              </div>
+              <div class="bg-[#fbf8f0] border border-amber-700/20 p-3 rounded-xl">
+                <span id="timer-minutes" class="font-['Playfair_Display'] text-2xl sm:text-3xl font-bold text-amber-950 block">00</span>
+                <span class="text-[9px] font-['Plus_Jakarta_Sans'] tracking-widest text-stone-500 uppercase font-semibold">Mins</span>
+              </div>
+              <div class="bg-[#fbf8f0] border border-amber-700/20 p-3 rounded-xl">
+                <span id="timer-seconds" class="font-['Playfair_Display'] text-2xl sm:text-3xl font-bold text-amber-950 block">00</span>
+                <span class="text-[9px] font-['Plus_Jakarta_Sans'] tracking-widest text-stone-500 uppercase font-semibold">Secs</span>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- WITH BEST COMPLIMENTS FROM (Exact Dignitaries) -->
+          <section id="compliments" class="bg-white/90 rounded-2xl p-6 sm:p-8 gold-card-border shadow-sm text-center">
+            <h3 class="font-['Playfair_Display'] italic text-2xl text-amber-900 font-semibold mb-6">
+              With Best Compliments From
+            </h3>
+
+            <div class="space-y-4 max-w-md mx-auto">
+              
+              <!-- Dignitary 1 -->
+              <div class="p-4 rounded-xl bg-[#fcf9f2] border border-amber-700/20">
+                <h4 class="font-['Cinzel'] text-base font-bold text-amber-950 tracking-wider uppercase">
+                  Mr. Kamal Akhtar
+                </h4>
+                <p class="font-['Plus_Jakarta_Sans'] text-[11px] tracking-wider text-stone-600 uppercase font-medium mt-1 leading-relaxed">
+                  MLA, Kanth | Former Cabinet Minister, UP<br>
+                  Former MP, Rajya Sabha
+                </p>
+              </div>
+
+              <!-- Dignitary 2 -->
+              <div class="p-4 rounded-xl bg-[#fcf9f2] border border-amber-700/20">
+                <h4 class="font-['Cinzel'] text-base font-bold text-amber-950 tracking-wider uppercase">
+                  Mr. Arif Akhtar
+                </h4>
+                <p class="font-['Plus_Jakarta_Sans'] text-[11px] tracking-wider text-stone-600 uppercase font-medium mt-1 leading-relaxed">
+                  State Secretary<br>
+                  Samajwadi Party Uttar Pradesh
+                </p>
+              </div>
+
+            </div>
+          </section>
+
+
+          <!-- KINDLY RESPOND (RSVP) -->
+          <section class="bg-white/90 rounded-2xl p-6 sm:p-8 gold-card-border shadow-sm text-center">
+            <span class="font-['Cinzel'] text-[10px] tracking-[0.25em] text-amber-800 uppercase font-bold block mb-1">
+              Kindly Respond
+            </span>
+            <h3 class="font-['Playfair_Display'] text-2xl text-stone-800">
+              Will you <span class="italic font-['Alex_Brush'] text-4xl text-amber-900">join us?</span>
+            </h3>
+            <p class="font-['Playfair_Display'] italic text-xs text-stone-500 mt-1 mb-5">
+              Your presence and prayers are the most precious gift.
+            </p>
+
+            <div class="max-w-xs mx-auto space-y-2.5">
+              <button onclick="recordRSVP(true)" class="w-full py-3 px-5 rounded-full bg-[#18392b] text-white font-['Cinzel'] text-xs tracking-wider uppercase font-semibold shadow hover:bg-[#122c21] transition-all flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-check text-xs"></i>
+                <span>Yes, with great pleasure</span>
+              </button>
+              <button onclick="recordRSVP(false)" class="w-full py-2.5 px-5 rounded-full bg-[#f4eee1] hover:bg-[#ecdfc9] text-stone-700 font-['Cinzel'] text-xs tracking-wider uppercase font-semibold border border-amber-700/20 transition-all flex items-center justify-center space-x-2">
+                <i class="fa-regular fa-envelope text-xs"></i>
+                <span>Unable to attend</span>
+              </button>
+            </div>
+
+            <div id="rsvpStatus" class="hidden mt-4 p-3 rounded-xl bg-[#fbf8f0] border border-amber-700/30 text-amber-900 text-xs font-['Playfair_Display'] italic">
+              JazakAllah Khair! Your response has been recorded.
+            </div>
+          </section>
+
+
+          <!-- DUA & BLESSINGS WALL -->
+          <section id="dua" class="bg-white/90 rounded-2xl p-6 sm:p-8 gold-card-border shadow-sm text-center">
+            <h3 class="font-['Cinzel'] text-xs tracking-[0.25em] text-amber-800 uppercase font-bold mb-1">
+              Leave a Dua &amp; Blessing
+            </h3>
+            <p class="font-['Playfair_Display'] italic text-xs text-stone-500 mb-5">
+              Share your Mubarakbaad and heartfelt prayers for Layba &amp; Ayan
+            </p>
+
+            <div class="max-w-md mx-auto space-y-3 mb-6">
+              <input type="text" id="duaName" placeholder="Your Full Name" class="w-full px-4 py-2.5 rounded-xl bg-[#fcf9f2] border border-amber-700/25 text-stone-800 placeholder-stone-400 text-xs focus:outline-none focus:border-amber-700">
+              <textarea id="duaMessage" rows="2" placeholder="Write your Dua for Layba & Ayan..." class="w-full px-4 py-2.5 rounded-xl bg-[#fcf9f2] border border-amber-700/25 text-stone-800 placeholder-stone-400 text-xs focus:outline-none focus:border-amber-700"></textarea>
+              <button onclick="postDua()" class="w-full py-2.5 rounded-xl gold-gradient-bg text-amber-950 font-['Cinzel'] text-xs tracking-widest uppercase font-bold shadow-sm">
+                Send Dua 🤲
+              </button>
+            </div>
+
+            <div id="duaFeed" class="max-w-md mx-auto space-y-2.5 max-h-56 overflow-y-auto no-scrollbar text-left">
+              <div class="bg-[#fcf9f2] border border-amber-700/20 p-3.5 rounded-xl">
+                <p class="font-['Playfair_Display'] italic text-xs text-stone-700">
+                  "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fee khair! May Allah bless your new journey with immense happiness."
+                </p>
+                <div class="mt-2 flex justify-between items-center text-[10px] font-['Plus_Jakarta_Sans'] text-stone-500">
+                  <span class="text-amber-900 font-semibold">— Family &amp; Loved Ones</span>
+                  <span>Alhamdulillah</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+
+
+        <!-- RIGHT COLUMN: FLOATING ITINERARY TIMELINE (Matching your reference layout) -->
+        <div id="itinerary" class="lg:col-span-3 sticky top-24 space-y-6">
+          <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 gold-card-border shadow-sm">
+            
+            <div class="text-center pb-3 border-b border-amber-700/20">
+              <span class="font-['Cinzel'] text-[10px] tracking-[0.25em] text-amber-800 uppercase font-bold block">
+                Wedding Itinerary
+              </span>
+              <span class="font-['Playfair_Display'] text-lg font-bold text-amber-950">
+                1 December 2026
+              </span>
+            </div>
+
+            <!-- Schedule Items -->
+            <div class="space-y-4 pt-4">
+              
+              <div class="bg-[#fcf9f2] p-3.5 rounded-xl border border-amber-700/15">
+                <div class="font-['Cinzel'] text-[11px] font-bold text-amber-900">
+                  TUE, 1 DEC • 8:00 PM
+                </div>
+                <div class="font-['Playfair_Display'] text-sm font-semibold text-stone-800 mt-0.5">
+                  The Sacred Nikaah
+                </div>
+                <div class="font-['Plus_Jakarta_Sans'] text-[11px] text-stone-500 mt-1">
+                  Highway Resort, Gajraula
+                </div>
+              </div>
+
+              <div class="bg-[#fcf9f2] p-3.5 rounded-xl border border-amber-700/15">
+                <div class="font-['Cinzel'] text-[11px] font-bold text-amber-900">
+                  TUE, 1 DEC • 9:30 PM
+                </div>
+                <div class="font-['Playfair_Display'] text-sm font-semibold text-stone-800 mt-0.5">
+                  Dawat-e-Ta'am (Dinner)
+                </div>
+                <div class="font-['Plus_Jakarta_Sans'] text-[11px] text-stone-500 mt-1">
+                  Royal Feast for Guests
+                </div>
+              </div>
+
+              <div class="bg-[#fcf9f2] p-3.5 rounded-xl border border-amber-700/15">
+                <div class="font-['Cinzel'] text-[11px] font-bold text-amber-900">
+                  TUE, 1 DEC • 11:00 PM
+                </div>
+                <div class="font-['Playfair_Display'] text-sm font-semibold text-stone-800 mt-0.5">
+                  Rukhsati
+                </div>
+                <div class="font-['Plus_Jakarta_Sans'] text-[11px] text-stone-500 mt-1">
+                  With Prayers &amp; Blessings
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="text-center pt-12 border-t border-amber-700/20 text-stone-500 font-['Plus_Jakarta_Sans'] text-xs tracking-widest mt-12">
+        <p class="font-['Cinzel'] uppercase text-amber-900 text-sm font-bold">Layba &amp; Ayan</p>
+        <p class="text-[11px] text-stone-500 mt-1">Tuesday, 1st December 2026 • Highway Resort, Gajraula</p>
+      </footer>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================
+       SCRIPTS & LOGIC
+       ======================================================== -->
+  <script>
+    // --------------------------------------------------------
+    // 1. UNPACK / UNFOLD EXPERIENCE (STAGE 1 -> STAGE 2)
+    // --------------------------------------------------------
+    let isUnfolded = false;
+
+    function unfoldInvitation() {
+      if (isUnfolded) return;
+      isUnfolded = true;
+
+      const envelope = document.getElementById('interactiveEnvelope');
+      envelope.classList.add('envelope-open');
+
+      // Golden fireworks burst from wax seal
+      confetti({
+        particleCount: 70,
+        spread: 80,
+        origin: { y: 0.55 },
+        colors: ['#c59b27', '#f4e197', '#8f681a', '#ffffff']
+      });
+
+      // Start Bismillah song
+      startAudioPlayback();
+
+      // Smoothly transition from Envelope Stage to Full Website
+      setTimeout(() => {
+        const stage = document.getElementById('envelopeStage');
+        stage.style.opacity = '0';
+        stage.style.pointerEvents = 'none';
+
+        const mainWeb = document.getElementById('mainWebsite');
+        mainWeb.classList.remove('opacity-0');
+        mainWeb.classList.add('opacity-100');
+
+        setTimeout(() => {
+          stage.style.display = 'none';
+        }, 800);
+      }, 850);
+    }
+
+
+    // --------------------------------------------------------
+    // 2. BISMILLAH SONG – HTML5 Audio Player
+    // --------------------------------------------------------
+
+    const bgAudio = new Audio('bismillah.mp3');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.80;
+    bgAudio.currentTime = 192; // Start from 3:12
+
+    // Reset to 3:12 on each loop
+    bgAudio.addEventListener('timeupdate', () => {
+      if (bgAudio.duration && bgAudio.currentTime >= bgAudio.duration - 0.3) {
+        bgAudio.currentTime = 192;
+      }
+    });
+
+    let isAudioPlaying = false;
+
+    function startAudioPlayback() {
+      bgAudio.play().then(() => {
+        isAudioPlaying = true;
+        document.getElementById('soundWaves').classList.remove('waves-paused');
+        document.getElementById('musicBtnLabel').textContent = 'Pause Bismillah';
+      }).catch(() => {
+        // Autoplay blocked — wait for user click
+        isAudioPlaying = false;
+      });
+    }
+
+    function toggleAudio() {
+      if (isAudioPlaying) {
+        isAudioPlaying = false;
+        bgAudio.pause();
+        document.getElementById('soundWaves').classList.add('waves-paused');
+        document.getElementById('musicBtnLabel').textContent = 'Play Bismillah';
+      } else {
+        bgAudio.play();
+        isAudioPlaying = true;
+        document.getElementById('soundWaves').classList.remove('waves-paused');
+        document.getElementById('musicBtnLabel').textContent = 'Pause Bismillah';
+      }
+    }
+
+
+    // --------------------------------------------------------
+    // 3. CANVAS AMBIENT GOLD DUST & JASMINE PETALS
+    // --------------------------------------------------------
+    const canvas = document.getElementById('ambient-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    for (let i = 0; i < 32; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        isPetal: Math.random() > 0.45,
+        size: Math.random() * 5 + 3,
+        speedY: Math.random() * 0.5 + 0.3,
+        speedX: (Math.random() - 0.5) * 0.4,
+        angle: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 1.5,
+        opacity: Math.random() * 0.4 + 0.2
+      });
+    }
+
+    function drawAmbient() {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.y += p.speedY;
+        p.x += Math.sin(p.y * 0.01) * 0.3;
+        p.angle += p.rotSpeed;
+
+        if (p.y > height + 20) {
+          p.y = -20;
+          p.x = Math.random() * width;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.angle * Math.PI) / 180);
+        ctx.globalAlpha = p.opacity;
+
+        if (p.isPetal) {
+          ctx.fillStyle = '#faf6ed';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(-p.size * 0.5, -p.size * 0.5, 0, p.size);
+          ctx.quadraticCurveTo(p.size * 0.5, -p.size * 0.5, 0, 0);
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#c59b27';
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      });
+
+      requestAnimationFrame(drawAmbient);
+    }
+    drawAmbient();
+
+
+    // --------------------------------------------------------
+    // 4. LIVE WEDDING COUNTDOWN (Tuesday, 1 Dec 2026, 8:00 PM)
+    // --------------------------------------------------------
+    const nikaahTimestamp = new Date("December 1, 2026 20:00:00 GMT+0530").getTime();
+
+    function updateTimer() {
+      const diff = nikaahTimestamp - new Date().getTime();
+      if (diff <= 0) return;
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById('timer-days').innerText = String(d).padStart(2, '0');
+      document.getElementById('timer-hours').innerText = String(h).padStart(2, '0');
+      document.getElementById('timer-minutes').innerText = String(m).padStart(2, '0');
+      document.getElementById('timer-seconds').innerText = String(s).padStart(2, '0');
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+
+    // --------------------------------------------------------
+    // 5. GOOGLE CALENDAR SYNC
+    // --------------------------------------------------------
+    function addToGoogleCalendar() {
+      const title = encodeURIComponent("Nikaah Ceremony: Layba & Ayan");
+      const location = encodeURIComponent("Highway Resort, Gajraula, Uttar Pradesh");
+      const details = encodeURIComponent("You are cordially invited to celebrate the Nikaah of Layba and Ayan.");
+      const start = "20261201T143000Z"; // 8:00 PM IST
+      const end = "20261201T183000Z";
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+      window.open(url, '_blank');
+    }
+
+
+    // --------------------------------------------------------
+    // 6. RSVP CELEBRATION
+    // --------------------------------------------------------
+    function recordRSVP(accepted) {
+      const statusBox = document.getElementById('rsvpStatus');
+      statusBox.classList.remove('hidden');
+
+      if (accepted) {
+        statusBox.innerHTML = "✨ <strong>JazakAllah Khair!</strong> We look forward to welcoming you with warmth and love.";
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          origin: { y: 0.75 },
+          colors: ['#c59b27', '#f4e197', '#8f681a']
+        });
+      } else {
+        statusBox.innerHTML = "🕊️ <strong>JazakAllah Khair</strong> for your prayers and kind blessings for Layba & Ayan.";
+      }
+    }
+
+
+    // --------------------------------------------------------
+    // 7. REAL-TIME DUA FEED
+    // --------------------------------------------------------
+    function postDua() {
+      const nameInput = document.getElementById('duaName');
+      const msgInput = document.getElementById('duaMessage');
+      const name = nameInput.value.trim();
+      const msg = msgInput.value.trim();
+
+      if (!name || !msg) {
+        msgInput.focus();
+        return;
+      }
+
+      const feed = document.getElementById('duaFeed');
+      const item = document.createElement('div');
+      item.className = "bg-[#fcf9f2] border border-amber-700/25 p-3.5 rounded-xl transition-all";
+      item.innerHTML = `
+        <p class="font-['Playfair_Display'] italic text-xs text-stone-700">"${msg}"</p>
+        <div class="mt-2 flex justify-between items-center text-[10px] font-['Plus_Jakarta_Sans'] text-stone-500">
+          <span class="text-amber-900 font-semibold">— ${name}</span>
+          <span>Just now 🤍</span>
+        </div>
+      `;
+
+      feed.prepend(item);
+
+      confetti({
+        particleCount: 25,
+        spread: 35,
+        origin: { y: 0.8 },
+        colors: ['#c59b27', '#ffffff']
+      });
+
+      nameInput.value = '';
+      msgInput.value = '';
+    }
+  </script>
+
+</body>
+</html>
