@@ -752,14 +752,6 @@
     const bgAudio = new Audio('bismillah.mp3');
     bgAudio.loop = true;
     bgAudio.volume = 0.80;
-    bgAudio.currentTime = 192; // Start from 3:12
-
-    // Reset to 3:12 on each loop
-    bgAudio.addEventListener('timeupdate', () => {
-      if (bgAudio.duration && bgAudio.currentTime >= bgAudio.duration - 0.3) {
-        bgAudio.currentTime = 192;
-      }
-    });
 
     let isAudioPlaying = false;
 
